@@ -20,7 +20,7 @@ below):
 `cd mbedtls-2.13.0; make`
 
 # Usage
-'./tls_client [IPv4 Address] [Port]'
+`./tls_client [IPv4 Address] [Port]`
 
 You can test the client with the included Python HTTP/S server.  The server 
 takes no options but can be modified to change the listening port.
