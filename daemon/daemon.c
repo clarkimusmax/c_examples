@@ -28,7 +28,7 @@ int main (void)
 	/*
 	 * Fork twice, calling setsid() after the first fork
 	 */
-	while (!twice) {
+	while (1) {
 		pid = fork();
 
 		/* Error */
@@ -51,6 +51,8 @@ int main (void)
 		 */
 		if (!twice++)
 			setsid();
+		else
+			break;
 	}
 
 	/*
