@@ -6,6 +6,10 @@
  * https://github.com/ne2der/ASyScallHookFrame/blob/master/hook_syscalltable/kernel_hook.c
  */
 
+#ifndef __x86_64__
+#error "Building for non-x86_64 systems is not supported"
+#endif
+
 #include <linux/module.h>
 #include <linux/kernel.h>
 #include <linux/init.h>
