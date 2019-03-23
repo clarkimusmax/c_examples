@@ -393,7 +393,7 @@ int main (int argc, char *argv[])
 
 	for (i = optind; i < argc; i++) {
 		fprintf(stderr, "Invalid argument: %s\n", argv[i]);
-		return 1;
+		exit(1);
 	}
 
 	if (!interface) {
