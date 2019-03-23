@@ -310,7 +310,7 @@ void print_udp (void *packet, size_t len)
 	 *      u_int16_t check;
 	 * };
 	 *
-	 * You may notice that the port in the UDP header are in the exact same
+	 * You may notice that the ports in the UDP header are in the exact same
 	 * location as with TCP.  Knowing the similarities could help determine
 	 * when it's appropriate to reuse code.  This function is nearly
 	 * equivalent to the previous TCP printing function.
@@ -334,7 +334,7 @@ void print_udp (void *packet, size_t len)
 		printf(" Incomplete Headers");
 		return;
 	}
-	udph = packet + sizeof(struct ethhdr) + ((struct iphdr*)((char*)packet + sizeof(struct ethhdr)))->ihl*4;
+	udph = (struct udphdr*)((char*)packet + sizeof(struct ethhdr) + ((struct iphdr*)((char*)packet + sizeof(struct ethhdr)))->ihl*4);
 
 	/* Print ports */
 	printf(" UDP: %u->%u", ntohs(udph->source), ntohs(udph->dest));
