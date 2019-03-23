@@ -465,7 +465,7 @@ int main (int argc, char *argv[])
 	}
 
 free_packbuf_and_exit:
-		free(packet);
+	free(packet);
 close_socket_and_exit:
 	while (close(sock) && errno == EINTR);
 	if (errno)
