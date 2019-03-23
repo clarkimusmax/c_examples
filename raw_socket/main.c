@@ -293,7 +293,7 @@ void print_tcp (void *packet, size_t len)
 	 * 	printf(" Incomplete Headers");
 	 * 	return;
 	 * }
-	 * tcph = packet + sizeof(ethhdr) + ((struct iph*)(packet + sizeof(ethhdr)))->ihl*4;
+	 * tcph = (char*)packet + sizeof(ethhdr) + ((struct iph*)(packet + sizeof(ethhdr)))->ihl*4;
 	 */
 
 	printf(" TCP: %u->%u", ntohs(tcph->source), ntohs(tcph->dest));
