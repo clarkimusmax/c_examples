@@ -278,7 +278,7 @@ void print_tcp (void *packet, size_t len)
 		/*
 		 * or, equivalently:
 		 *
-		 * tcph = packet + sizeof(ethhdr) + iph_len;
+		 * tcph = (char*)packet + sizeof(ethhdr) + iph_len;
 		 */
 	}
 
