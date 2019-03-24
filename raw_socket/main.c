@@ -14,20 +14,20 @@
  * TODO: IPv6
  */
 
-#include <stdio.h>
-#include <unistd.h>
-#include <stdlib.h>
 #include <ctype.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
 #include <errno.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
 #include <arpa/inet.h>
 #include <linux/if_ether.h>
+#include <netinet/in.h>
 #include <netinet/ip.h>
 #include <netinet/tcp.h>
 #include <netinet/udp.h>
+#include <sys/types.h>
+#include <sys/socket.h>
 
 /*
  * Define DEBUG to also print next protocol for ethernet and IP printers:
