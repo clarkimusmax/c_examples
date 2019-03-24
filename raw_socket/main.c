@@ -1,5 +1,17 @@
 /*
  * Simple example of Linux raw sockets.
+ *
+ * Some useful resources:
+ * 	man 7 packet	-	Linux packet interface
+ * 	man 2 socket	-	socket() library call
+ * 	man 7 socket	-	Linux sockets
+ * 	man 7 ip	-	Internet Protocol
+ * 	man 7 raw	-	Linux raw sockets
+ * 	man 7 tcp	-	Transmission Control Protocol
+ * 	man 7 udp	-	User Datagram Protocol
+ *
+ * TODO: Signal handling
+ * TODO: IPv6
  */
 
 #include <stdio.h>
@@ -174,8 +186,14 @@ int print_ip (void *packet, size_t len)
 	 * inet_ntop can return an error, but only if we screwed up the address
 	 * length or IP isn't supported.
 	 * */
-	(void) inet_ntop (AF_INET, (struct in_addr*)&(iph->saddr), src_ip, INET_ADDRSTRLEN);
-	(void) inet_ntop (AF_INET, (struct in_addr*)&(iph->daddr), dst_ip, INET_ADDRSTRLEN);
+	(void) inet_ntop (AF_INET, 
+				(struct in_addr*)&(iph->saddr), 
+				src_ip, 
+				INET_ADDRSTRLEN);
+	(void) inet_ntop (AF_INET, 
+				(struct in_addr*)&(iph->daddr), 
+				dst_ip, 
+				INET_ADDRSTRLEN);
 
 	/* Print address info */
 	printf(" IP: %s->%s", src_ip, dst_ip);
@@ -201,7 +219,7 @@ void print_tcp (void *packet, size_t len)
 	 *
 	 * Similar to the IP header, the TCP header also may have a variable
 	 * length.  This will not affect how we're processing any of this since
-	 * we're moving further into the packet than the port numbers.
+	 * we're not moving further into the packet than the port numbers.
 	 *
 	 * The TCP header is described in RFC 793 section 3.1:
 	 * 	0                   1                   2                   3
@@ -243,15 +261,26 @@ void print_tcp (void *packet, size_t len)
 		iph = (struct iphdr*)((char*)packet + sizeof(struct ethhdr));
 
 		/*
-		 * Per RFC 791 section 3.1:
+		 * Per RFC 791 (Internet Protocol) section 3.1:
 		 * IHL:  4 bits
-		 * 	Internet Header Length is the length of the internet header in 32
-		 * 	bit words, and thus points to the beginning of the data.  Note that
-		 *      the minimum value for a correct header is 5.
+		 * 	Internet Header Length is the length of the internet
+		 * 	header in 32 bit words, and thus points to the 
+		 * 	beginning of the data.  Note that the minimum value for
+		 * 	a correct header is 5.
+		 *
+		 * 32 bit words is equivalent to 4 bytes, so, including
+		 * potential IP options:
+		 * 	IHL * 4 == IP header length
 		 */
 		iph_len = iph->ihl * 4;
 
-		if (sizeof(struct ethhdr) + iph_len > len) {
+		/* 
+		 * Keep in mind that the following does not guarantee we have
+		 * the complete TCP header (since it's variable length), but
+		 * for our purpose of printing port numbers, we don't need to
+		 * worry about exact length, similar to our IP printer function.
+		 */
+		if (sizeof(struct ethhdr) + iph_len + sizeof(struct tcphdr) > len) {
 			printf(" Incomplete TCP Header");
 			return;
 		}
@@ -272,6 +301,9 @@ void print_tcp (void *packet, size_t len)
 		 * 	[address of iph] + (1 * sizeof(char))
 		 * 		OR
 		 * 	[address of iph] + (1 * 1)
+		 *
+		 * Also, worth noting, math with void pointers in undefined,
+		 * cast them first!
 		 */
 		tcph = (struct tcphdr*)((char*)iph + iph_len);
 
@@ -285,15 +317,16 @@ void print_tcp (void *packet, size_t len)
 	/*
 	 * That was a lot of code to do some pretty simple stuff.  The code can
 	 * be abbreviated to something like this.  It may not be as easy to
-	 * read, but it eliminates the need to store a pointer to the IP header
-	 * and the IP header length.
+	 * read, and will definitely anger the long line sticklers, but it 
+	 * eliminates the need to store a pointer to the IP header and the IP
+	 * header length.
 	 *
 	 * if (sizeof(ethhdr) + sizeof(iphdr) > len ||
-	 * 	sizeof(ethhdr) + ((struct iph*)(packet + sizeof(ethhdr)))->ihl*4 > len) {
+	 * 	sizeof(ethhdr) + ((struct iphdr*)((char*)packet + sizeof(ethhdr)))->ihl*4 + sizeof(struct udphdr) > len) {
 	 * 	printf(" Incomplete Headers");
 	 * 	return;
 	 * }
-	 * tcph = (char*)packet + sizeof(ethhdr) + ((struct iph*)(packet + sizeof(ethhdr)))->ihl*4;
+	 * tcph = (char*)packet + sizeof(ethhdr) + ((struct iph*)((char*)packet + sizeof(ethhdr)))->ihl*4;
 	 */
 
 	printf(" TCP: %u->%u", ntohs(tcph->source), ntohs(tcph->dest));
@@ -313,7 +346,9 @@ void print_udp (void *packet, size_t len)
 	 * You may notice that the ports in the UDP header are in the exact same
 	 * location as with TCP.  Knowing the similarities could help determine
 	 * when it's appropriate to reuse code.  This function is nearly
-	 * equivalent to the previous TCP printing function.
+	 * equivalent to the previous TCP printing function.  In fact, for the
+	 * purpose of only accessing ports, we could have cast either TCP or 
+	 * UDP to the other's structure type.
 	 *
 	 * From RFC 768:
 	 *	0      7 8     15 16    23 24    31
@@ -326,11 +361,11 @@ void print_udp (void *packet, size_t len)
 	 *      +--------+--------+--------+--------+
 	 */
 
-	struct udphdr * udph;
+	struct udphdr *udph;
 
 	/* Ensure we have enough packet to access the UDP header */
 	if (sizeof(struct ethhdr) + sizeof(struct iphdr) > len ||
-		sizeof(struct ethhdr) + ((struct iphdr*)((char*)packet + sizeof(struct ethhdr)))->ihl*4 > len) {
+		sizeof(struct ethhdr) + ((struct iphdr*)((char*)packet + sizeof(struct ethhdr)))->ihl*4 + sizeof(struct udphdr) > len) {
 		printf(" Incomplete Headers");
 		return;
 	}
@@ -347,7 +382,8 @@ int main (int argc, char *argv[])
 {
 	int opt;
 	int i;
-	int tcp = 0, udp = 0, l4;
+	int want_tcp = 0, want_udp = 0;
+	int l4_proto;
 	int sock;
 	int ret = 0;
 	size_t packet_count = 0;
@@ -363,10 +399,10 @@ int main (int argc, char *argv[])
 		case 'p':
 			if (strlen(optarg) == 3) {
 				if (!strcmp(optarg, "tcp")) {
-					tcp++;
+					want_tcp++;
 					break;
 				} else if (!strcmp(optarg, "udp")) {
-					udp++;
+					want_udp++;
 					break;
 				}
 			}
@@ -405,16 +441,50 @@ int main (int argc, char *argv[])
 	/* You have to love the ternary operator */
 	printf("Listening on %s for protocol %s\n",
 		interface,
-		(tcp && udp)? "all" : (tcp) ? "TCP" : (udp) ? "UDP" : "IP");
+		(want_tcp && want_udp)? "all" : (want_tcp) ? "TCP" : (want_udp) ? "UDP" : "IP");
 
-	/* Create raw socket */
+	/* 
+	 * Create raw socket
+	 *
+	 * A refresher from `man 2 socket`:
+	 * 	int socket(int domain, int type, int protocol);
+	 *
+	 * According to `man 7 packet`, the packet interface (AF_PACKET) is 
+	 * what to use for accessing packets at the device driver level (OSI
+	 * Layer 2).  This will allow us to receive the entire ethernet frame,
+	 * similar to what we would see in Wireshark.
+	 *
+	 * When using AF_PACKET as the domain for the socket() call,
+	 * we have two options for the type field: SOCK_RAW and SOCK_DGRAM.
+	 * 
+	 * 	SOCK_RAW is the option to receive the Layer 2 headers.
+	 * 
+	 * 	SOCK_DGRAM is the option to receive packets with the Layer 2
+	 * 	headers removed.  In this context, SOCK_DGRAM does not refer to
+	 * 	UDP.
+	 *
+	 * For the final parameter to socket(), the protocol, we can either
+	 * specify the IEEE 802.3 protocol number, or in this case, using 
+	 * ETH_P_ALL, specify that we want all frames regardless of their Layer
+	 * 3 protocol.
+	 *
+	 * IEEE 802.3 protocol numbers, such as 0x0800 (ETH_P_IP) for IP or 
+	 * 0x0806 (ETH_P_ARP) for ARP, can be found in linux/if_ether.h
+	 */
 	sock = socket(AF_PACKET, SOCK_RAW, htons(ETH_P_ALL));
 	if (sock == -1) {
 		perror("socket");
 		exit(1);
 	}
 
-	/* Bind socket to interface */
+	/*
+	 * Bind socket to interface
+	 *
+	 * The option SO_BINDTODEVICE is explained in `man 7 socket` and will 
+	 * bind a socket to a specified interface ("eth0", "wlan0", etc.).  In
+	 * this case, we're passing the user-supplied interface from the "-i" 
+	 * option.
+	 */
 	if (setsockopt(sock, SOL_SOCKET, SO_BINDTODEVICE, interface, strlen(interface)) == -1) {
 		perror("setsockopt");
 		ret = 1;
@@ -431,7 +501,17 @@ int main (int argc, char *argv[])
 
 	/* Capture loop */
 	while (1) {
-		/* Get a packet */
+		/*
+		 * Get a packet
+		 *
+		 * ssize_t recvfrom(int sockfd, void *buf, size_t len, int flags,
+		 * 			struct sockaddr *src_addr, socklen_t *addrlen);
+		 *
+		 * In this case, we could have equivalently used recv(), since
+		 * we're not requesting the source address.
+		 * 
+		 * ssize_t recv(int sockfd, void *buf, size_t len, int flags);
+		 */
 		bytes_recv = recvfrom(sock, packet, PACKET_BUFFER_LEN, 0, NULL, NULL);
 		if (bytes_recv < 1) {
 			perror("recvfrom");
@@ -452,11 +532,11 @@ int main (int argc, char *argv[])
 		/* Ethernet */
 		if (print_ether(packet, bytes_recv) == ETH_P_IP) {
 			/* IP */
-			l4 = print_ip(packet, bytes_recv);
-			if (tcp && l4 == IPPROTO_TCP) {
+			l4_proto = print_ip(packet, bytes_recv);
+			if (want_tcp && l4_proto == IPPROTO_TCP) {
 				/* TCP */
 				print_tcp(packet, bytes_recv);
-			} else if (udp && l4  == IPPROTO_UDP) {
+			} else if (want_udp && l4_proto  == IPPROTO_UDP) {
 				/* UDP */
 				print_udp(packet, bytes_recv);
 			}
