@@ -548,7 +548,7 @@ free_packbuf_and_exit:
 	free(packet);
 close_socket_and_exit:
 	if (close(sock))
-	     perror("close");
+		perror("close");
 
 	return ret;
 }
