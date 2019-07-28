@@ -547,9 +547,8 @@ int main (int argc, char *argv[])
 free_packbuf_and_exit:
 	free(packet);
 close_socket_and_exit:
-	while (close(sock) && errno == EINTR);
-	if (errno)
-		perror("close");
+	if (close(sock))
+	     perror("close");
 
 	return ret;
 }
