@@ -148,7 +148,7 @@ int main (int argc, char *argv[])
 		/* Encountered error, exit loop */
 		if (ret < 0) {
 			mbedtls_strerror(ret, mbedtls_error, MBEDTLS_ERROR_BUFFER_SIZE);
-			fprintf(stderr, "mbedtls_ssl_handshake failed: %s\n", mbedtls_error);
+			fprintf(stderr, "mbedtls_ssl_read failed: %s\n", mbedtls_error);
 			free(response);
 			goto free_and_exit;
 		}
