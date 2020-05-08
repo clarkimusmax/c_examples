@@ -14,5 +14,8 @@ An example of a Linux kernel module that finds the syscall table and "hijacks" a
 ### MBED TLS
 An example of a TLS client utilizing the ARM mbed TLS library (formerly known as PolarSSL).
 
+### MBED TLS w/ Certificate Verification 
+An example of a TLS client and server supporting certificate verification with a helper script to generate and sign CA, server, and client certificates.
+
 ### Raw Socket
 An example of Linux raw sockets with lots of comments.
