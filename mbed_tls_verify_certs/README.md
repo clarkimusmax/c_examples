@@ -27,17 +27,15 @@ below and in the `Makefile`):
 * Start by generating keys and certificates for a CA, server, and client:
 `./gen_certs.sh`
 
-* Run the included python2.7 HTTP/S server
-`python2.7 https_server.py
-
 * Run the server
 `./tls_server [Port]
 
 * Run the tls client
 `./tls_client [Address] [Port]`
 
-You can optionally test the client with the included Python HTTP/S server.  The server 
-takes no options but can be modified to change the listening port.
+You can optionally test the client with the included Python HTTP/S server.
+The python server takes no options but can be modified to change the listening
+port.
 `./https_server.py`
 
 # TODO
