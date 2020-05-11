@@ -5,22 +5,14 @@ Based on this and other MBED TLS documentation or source examples:
 <https://github.com/ARMmbed/mbedtls/blob/development/programs/ssl/>
 
 # Build
-You will need to download the mbedtls source and build the static libraries. 
+You will need to download the mbedtls source and build the static libraries.
+This can be done manually or by running the `download_current_mbedtls.sh`
+script included here.
 
-Simple steps to get these static libs (alternatively, you can use the most 
-current version from https://tls.mbed.org, just change the version numbers 
-below and in the `Makefile`):
+1. Download the source (requires curl):
+`./download_current_mbedtls.sh`
 
-1. Download the source:
-`wget https://tls.mbed.org/download/mbedtls-2.16.6-apache.tgz`
-
-2. Extract it in your project dir:
-`tar -xzf mbedtls-2.16.6-apache.tgz`
-
-3. Build the libraries:
-``` cd mbedtls-2.16.6; make -j `nproc`; cd .. ```
-
-4. Build the TLS client and server:
+4. Build it with Make:
 ``` `make -j `nproc` ```
 
 # Usage

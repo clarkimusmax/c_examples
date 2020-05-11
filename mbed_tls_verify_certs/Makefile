@@ -22,13 +22,16 @@ MBED_LIBS = $(MBED_DIR)/library/libmbedtls.a \
 	    $(MBED_DIR)/library/libmbedcrypto.a
 
 .PHONY: all
-all: tls_client tls_server
+all: tls_client tls_server $(MBED_LIBS)
 
 tls_client: tls_client.o $(MBED_LIBS)
 	$(CC) $(CFLAGS) -o $@ $^
 
 tls_server: tls_server.o $(MBED_LIBS)
 	$(CC) $(CFLAGS) -o $@ $^
+
+$(MBED_LIBS):
+	${MAKE} -C $(MBED_DIR) -j $(shell nproc)
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c -o $@ $<
