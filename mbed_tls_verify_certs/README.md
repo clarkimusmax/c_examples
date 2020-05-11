@@ -13,7 +13,7 @@ manually (<https://tls.mbed.org>)or by running the included script:
 `./download_current_mbedtls.sh`
 
 4. Build it with Make:  
-``` `make -j `nproc` ```
+``` make -j `nproc` ```
 
 # Usage
 * Start by generating keys and certificates for a CA, server, and client:  
