@@ -5,9 +5,9 @@ Based on this and other MBED TLS documentation or source examples:
 <https://github.com/ARMmbed/mbedtls/blob/development/programs/ssl/>
 
 # Build
-You will need to download the mbedtls source and build the static libraries.
-This can be done manually or by running the `download_current_mbedtls.sh`
-script included here.
+You will need to download the mbedtls source and build it. This can be done 
+manually (<https://tls.mbed.org>)or by running the included script:
+`download_current_mbedtls.sh` .
 
 1. Download the source (requires curl):
 `./download_current_mbedtls.sh`
@@ -20,7 +20,7 @@ script included here.
 `./gen_certs.sh`
 
 * Run the server
-`./tls_server [Port]
+`./tls_server [Port]`
 
 * Run the tls client
 `./tls_client [Address] [Port]`
