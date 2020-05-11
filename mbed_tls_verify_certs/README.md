@@ -9,10 +9,10 @@ You will need to download the mbedtls source and build it. This can be done
 manually (<https://tls.mbed.org>)or by running the included script:
 `download_current_mbedtls.sh` .
 
-1. Download the source (requires curl):
+1. Download the source (requires curl): 
 `./download_current_mbedtls.sh`
 
-4. Build it with Make:
+4. Build it with Make: 
 ``` `make -j `nproc` ```
 
 # Usage
