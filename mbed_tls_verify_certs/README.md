@@ -9,20 +9,20 @@ You will need to download the mbedtls source and build it. This can be done
 manually (<https://tls.mbed.org>)or by running the included script:
 `download_current_mbedtls.sh` .
 
-1. Download the source (requires curl): 
+1. Download the source (requires curl):  
 `./download_current_mbedtls.sh`
 
-4. Build it with Make: 
+4. Build it with Make:  
 ``` `make -j `nproc` ```
 
 # Usage
-* Start by generating keys and certificates for a CA, server, and client:
+* Start by generating keys and certificates for a CA, server, and client:  
 `./gen_certs.sh`
 
-* Run the server
+* Run the server:  
 `./tls_server [Port]`
 
-* Run the tls client
+* Run the tls client:  
 `./tls_client [Address] [Port]`
 
 You can optionally test the client with the included Python HTTP/S server.
