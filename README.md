@@ -1,6 +1,6 @@
 # C Examples
 
-A reposity of some poorly-written C code snippets that do different things.
+A repository of some poorly-written C code snippets that do different things.
 
 ### Daemon
 An example of how to daemonize a Linux process.
